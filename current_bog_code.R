@@ -6,11 +6,11 @@ library(ggplot2)
 library(dplyr)
 library(MASS)
 library(stats)
+library(gridExtra)
 
 
 ##### Read in data and remove NAs
 
-setwd("~/Desktop/New Bog Stuff")
 bog1<-read.csv("bog_2015.csv")
 bog<-filter(bog1,GWC!="NA")
 bogMBC<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
@@ -241,12 +241,12 @@ d13_enzyNut_plot<-ggplot(data=bog_starch,aes(x=starch_enzyNut,y=d13)) +
 library(gridExtra)
 grid.arrange(d13_spruce_plot,d13_enzyC_plot,d13_enzyNut_plot,nrow=1)
 
-#####
-
+###### Does respiration predict d13?
 starch_resp<-lm(d13~resp)
-summary(starch_resp)
-
+summary(starch_resp) # no, p=0.88
 qplot(x=resp,y=d13)
+
+##### Is DOC vs. resp relationship significant?
 
 #########################################################################################################
 ######################################## SUPPLEMENTARY FIGURES ##########################################
