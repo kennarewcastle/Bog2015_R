@@ -1,0 +1,406 @@
+---
+title: "Bog Paper Code"
+author: "Kenna Rewcastle"
+date: "October 31, 2017"
+output: html_document
+---
+
+```{r Read in data and remove NAs}
+library(ggplot2)
+library(dplyr)
+
+setwd("~/Desktop/Classen Lab/Bog Project/Bog R") # Copy and paste into console to avoid weird Markdown issues
+bog1<-read.csv("bog_2015.csv")
+bog<-filter(bog1,GWC!="NA")
+bogMBC<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
+```
+
+
+##### Mesh size does not affect microbial biomass (plot and stats)
+
+```{r Mesh size does not affect MBC}
+meshMBC<-as.factor(bogMBC$treatment)
+MBC<-bogMBC$MBC.mg.C.g.1.dry.soil
+
+mesh_MBC<-lm(MBC~meshMBC)
+anova(mesh_MBC) # p = 0.09981
+summary(mesh_MBC)
+
+mesh_cols<-c("1"="grey60","2"="grey32","3"="black")
+mesh_scale<-c(1,2,3)
+
+mesh_MBC_fig<-ggplot(data=bogMBC,aes(x=meshMBC,y=MBC,colour=meshMBC)) +
+  geom_boxplot(lwd=1.5) +
+  labs(x="Mesh Size",y=bquote(bold('Microbial Biomass C (mg C '*g^-1*' dry soil)'))) +
+  scale_colour_manual(values=mesh_cols,labels=c("1.45 mm","55 \u03BCm","5 \u03BCm"),guide=FALSE) + 
+                                                # weird text is unicode for mu
+  annotate("text",x=3.4,y=4.1,label="A",size=10) +
+  scale_x_discrete(limits=mesh_scale, labels=c("1.45 mm","55 \u03BCm","5 \u03BCm")) +
+  theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA))
+
+mesh_MBC_fig
+```
+
+##### Mesh size does not affect peat water saturation (plot and stats)
+
+```{r}
+mesh<-as.factor(bog$treatment)
+sat<-bog$per..saturation
+
+mesh_sat<-lm(sat~mesh)
+anova(mesh_sat) # p = 0.09372
+summary(mesh_sat)
+
+mesh_cols<-c("1"="grey60","2"="grey32","3"="black")
+mesh_scale<-c(1,2,3)
+
+mesh_sat_fig<-ggplot(data=bog,aes(x=mesh,y=sat,colour=mesh)) +
+  geom_boxplot(lwd=1.5) +
+  labs(x="Mesh Size",y="% Peat Water Saturation") +
+  scale_colour_manual(values=mesh_cols,labels=c("1.45 mm","55 \u03BCm","5 \u03BCm"),guide=FALSE) + 
+                                                # weird text is unicode for mu
+  annotate("text",x=3.4,y=128,label="B",size=10) +
+  scale_x_discrete(limits=mesh_scale, labels=c("1.45 mm","55 \u03BCm","5 \u03BCm")) +
+  theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA))
+
+mesh_sat_fig
+```
+
+##### Paneled figure for supplemental Figure S1
+
+```{r}
+library(gridExtra)
+
+grid.arrange(mesh_MBC_fig,mesh_sat_fig,nrow=1)
+```
+
+##### Compress enzymes into a total nutrient enzyme activity parameter and a total carbon enzyme activity parameter.
+
+```{r}
+# nutrient enzymes
+NAG<-bogMBC$NAG
+PHOS<-bogMBC$PHOS
+LAP<-bogMBC$LAP 
+enzyNut<-NAG+PHOS+LAP
+
+# carbon enzymes
+CBH<-bogMBC$CBH
+AG<-bogMBC$AG
+BG<-bogMBC$BG
+enzyC<-CBH+AG+BG
+
+# add total enzyme columns to main dataframe
+realbog<-cbind(bogMBC,enzyNut,enzyC)
+```
+
+##### Labeled starch treatment was successful (increase in 13C CO2 respiration in labeled mesocosms)
+
+```{r}
+carbon<-as.factor(bog1$carbon)
+d13<-bog1$D5.d13
+
+d13effect<-t.test(formula=d13~carbon) # p < 0.001, t = -9.5717
+labeled<-filter(bog1,carbon=="label")
+water<-filter(bog1,carbon=="control")
+mean(labeled$D5.d13) # 136.05
+sd(labeled$D5.d13) # 82.06
+mean(water$D5.d13) # -7.82
+sd(water$D5.d13) # 6.65
+
+### Figure for S2
+d13_scale<-c(1,2)
+
+d13effect_fig<-ggplot(data=bog1,aes(x=carbon,y=d13)) +
+  geom_boxplot(lwd=1.5) +
+  labs(x=expression(bold(paste(text=" "^{bold("13")},"C"," Starch Addition"))),y=expression(bold(paste("\u03B4"^{bold("13")}, "C (\u2030)")))) +
+  scale_x_discrete(labels=c("control"="Control","label"="Labeled")) +
+  theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+        axis.text.y=element_text(colour="black",size=10),
+        axis.text.x=element_text(colour="black",size=14),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA))
+
+
+```
+
+#### Starch addition treatment doesn't affect: total resp, microbial biomass, enzyme activity (all 6), peat saturation, pH
+
+```{r}
+names(bog1)
+```
+
+```{r}
+carbon<-as.factor(bog1$carbon)
+resp<-bog1$D5.CO2
+MBC<-bog1$MBC.mg.C.g.1.dry.soil
+AG<-bog1$AG
+BG<-bog1$BG
+CBH<-bog1$CBH
+NAG<-bog1$NAG
+PHOS<-bog1$PHOS
+LAP<-bog1$LAP
+sat<-bog1$per..saturation
+pH<-bog1$pH
+DOC<-bog1$DOC..mg.C.g.1.dry.soil.
+CN<-bog1$peat.C.N
+
+# t-tests first
+starch_resp<-t.test(formula=resp~carbon) # p = 0.6186, t = -0.50054
+starch_MBC<-t.test(formula=MBC~carbon) # p = 0.667, t = -0.43349
+starch_AG<-t.test(formula=AG~carbon) # p = 0.4964, t = 0.68441
+starch_BG<-t.test(formula=BG~carbon) # p = 0.1615, t = -1.4219
+starch_CBH<-t.test(formula=CBH~carbon) # p = 0.1607, t = -1.4225
+starch_NAG<-t.test(formula=NAG~carbon) # p = 0.3001, t = 1.0463
+starch_PHOS<-t.test(formula=PHOS~carbon) # p = 0.166, t = -1.4057
+starch_LAP<-t.test(formula=LAP~carbon) # p = 0.6616, t = -0.44
+starch_sat<-t.test(formula=sat~carbon) # p = 0.2097, t = -1.2694 
+starch_pH<-t.test(formula=pH~carbon) # p = 0.8739, t = -0.15945
+starch_DOC<-t.test(formula=DOC~carbon) # p = 0.2034, t = 1.2964
+starch_CN<-t.test(formula=CN~carbon) # p = 0.9167, t = -0.10508
+
+### MIGHT need to build a supplemental figure displaying all of this
+
+```
+
+##### Model selection using step AIC for resp predictors.
+
+```{r}
+resp<-realbog$D5.CO2
+MBC<-realbog$MBC.mg.C.g.1.dry.soil
+resp_enzyC<-realbog$enzyC
+resp_enzyNut<-realbog$enzyNut
+sat<-realbog$per..saturation
+pH<-realbog$pH
+DOC<-realbog$DOC..mg.C.g.1.dry.soil.
+CN<-realbog$peat.C.N
+spruce<-realbog$Dist..Spruce..m.
+blub<-realbog$Dist..Blueberry..m.
+
+# Figure out parameter order in initial model by comparing resp~paramater R2
+
+predict1<-data.frame(MBC,resp_enzyC,resp_enzyNut,sat,pH,DOC,CN,spruce,blub)
+R2vect1<-c()
+
+param_R2<-function(predict,response,R2vect){
+  N<-ncol(predict)
+  for (i in 1:N) {
+    regression<-lm(response~predict[,i])
+    R2vect[i]<-summary(regression)$adj.r.squared
+    }
+  return(data.frame(names(predict),R2vect))
+}
+
+param_R2(predict=predict1,response=resp,R2vect=R2vect1)
+
+```
+```{r}
+library(MASS)
+resp<-realbog$D5.CO2
+MBC<-realbog$MBC.mg.C.g.1.dry.soil
+resp_enzyC<-realbog$enzyC
+resp_enzyNut<-realbog$enzyNut
+sat<-realbog$per..saturation
+pH<-realbog$pH
+DOC<-realbog$DOC..mg.C.g.1.dry.soil.
+CN<-realbog$peat.C.N
+spruce<-realbog$Dist..Spruce..m.
+blub<-realbog$Dist..Blueberry..m.
+  
+mod001<-lm(resp~sat+ enzyNut+ MBC+ enzyC+ spruce+ DOC+ pH+ CN+ blub)
+stepmod001<-stepAIC(mod001, direction="both") # best model: resp ~ sat + enzyC + spruce, AIC = 
+summary(stepmod001)
+
+```
+```{r}
+#### This new package computes a model selection table using AICc (better for smaller data sets)
+library(AICcmodavg) 
+
+## Take model output for each step from step AIC chart and build AICc table comparing these
+Cand.mod<-list()
+Cand.mod[[1]]<-lm(resp~sat+MBC+spruce+resp_PC1+DOC+CN+pH+blub)
+Cand.mod[[2]]<-lm(resp~sat+MBC+spruce+resp_PC1+DOC+CN+blub)
+Cand.mod[[3]]<-lm(resp~sat+MBC+spruce+resp_PC1+DOC+blub)
+Cand.mod[[4]]<-lm(resp~sat+MBC+spruce+resp_PC1+blub)
+Cand.mod[[5]]<-lm(resp~sat+MBC+spruce+resp_PC1)
+Cand.mod[[6]]<-lm(resp~sat+spruce+resp_PC1)
+
+## method for class 'AICclm'
+aictab(cand.set=Cand.mod)
+
+```
+
+##### Linear regressions between parameters in best fit model and resp
+
+```{r}
+## Revert to bog1 dataset that includes NAs
+
+resp<-bog1$D5.CO2
+sat<-bog1$per..saturation
+spruce<-bog1$Dist..Spruce..m.
+resp_PC1<-bog_resp$resp_PC1
+
+resp_sat<-lm(resp~sat)
+summary(resp_sat) # p < 0.001, R2 = 0.40
+
+resp_spruce<-lm(resp~spruce)
+summary(resp_spruce) # p = 0.001, R2 = 0.15
+
+resp_resp_PC1<-lm(resp~resp_PC1) # p = 0.002, R2 = 0.13
+summary(resp_resp_PC1)
+```
+
+##### Model selection using step AIC for d13 predictors.
+
+```{r}
+
+bog_starch<-filter(realbog,carbon=="label")
+
+d13<-bog_starch$D5.d13
+MBC<-bog_starch$MBC.mg.C.g.1.dry.soil
+logMBC<-log(MBC)
+starch_enzyC<-bog_starch$enzyC
+starch_enzyNut<-bog_starch$enzyNut
+sat<-bog_starch$per..saturation
+pH<-bog_starch$pH
+DOC<-bog_starch$DOC..mg.C.g.1.dry.soil.
+CN<-bog_starch$peat.C.N
+spruce<-bog_starch$Dist..Spruce..m.
+blub<-bog_starch$Dist..Blueberry..m.
+
+# Figure out parameter order in initial model by comparing resp~paramater R2
+
+predict2<-data.frame(logMBC,starch_enzyC,starch_enzyNut,sat,pH,DOC,CN,spruce,blub)
+R2vect2<-c()
+
+
+param_R2(predict=predict2,response=d13,R2vect=R2vect2)
+```
+```{r}
+library(MASS)
+  
+mod002<-lm(d13~spruce+ starch_enzyC+ logMBC+ sat+ starch_enzyNut+ DOC+ CN+ pH+ blub)
+stepmod002<-stepAIC(mod002, direction="both") # best model: resp~ spruce+ starch_enzyC + starch_enzyNut+ DOC
+summary(stepmod002)
+
+```
+```{r}
+#### This new package computes a model selection table using AICc (better for smaller data sets)
+library(AICcmodavg) 
+
+## Take model output for each step from step AIC chart and build AICc table comparing these
+Cand.mod_starch<-list()
+Cand.mod_starch[[1]]<-lm(d13~MBC+spruce+sat+starch_PC1+DOC+CN+pH+blub)
+Cand.mod_starch[[2]]<-lm(d13~MBC+spruce+sat+starch_PC1+CN+pH+blub)
+Cand.mod_starch[[3]]<-lm(d13~MBC+spruce+sat+starch_PC1+CN+pH)
+Cand.mod_starch[[4]]<-lm(d13~MBC+spruce+sat+starch_PC1+pH)
+Cand.mod_starch[[5]]<-lm(d13~MBC+spruce+starch_PC1+pH)
+Cand.mod_starch[[6]]<-lm(d13~MBC+spruce+pH)
+
+## method for class 'AICclm'
+aictab(cand.set=Cand.mod_starch)
+
+```
+
+##### Linear regressions between parameters in best fit model and resp
+
+```{r}
+## Revert to bog1 dataset that includes NAs
+
+resp<-bog1$D5.CO2
+sat<-bog1$per..saturation
+spruce<-bog1$Dist..Spruce..m.
+resp_PC1<-bog_resp$resp_PC1
+
+resp_sat<-lm(resp~sat)
+summary(resp_sat) # p < 0.001, R2 = 0.40
+
+resp_spruce<-lm(resp~spruce)
+summary(resp_spruce) # p = 0.001, R2 = 0.15
+
+resp_resp_PC1<-lm(resp~resp_PC1) # p = 0.002, R2 = 0.13
+summary(resp_resp_PC1)
+```
+
+
+
+
+
+
+
+
+
+
+
+################################################################################################################################################### EXTRA ##################################################### #########################################################################################################
+
+```{r}
+######### JUNK ############
+
+# From PCA help with Case
+library(ggbiplot)
+library(ggfortify)
+library(cluster)
+leaf$Group
+df <- leaf[c(8,14,20,24,25)]
+df
+autoplot(prcomp(df), center=TRUE, scale=TRUE, obs.scale=1)
+autoplot(prcomp(df), data = leaf, colour = 'Group', frame=TRUE, frame.type='norm', loadings=FALSE, loadings.label=FALSE, center=TRUE, scale=TRUE)#pca graph with   species depicted in different colors
+PCA1<-prcomp(df, scale=TRUE)
+
+Loadings <- as.data.frame(PCA1$rotation[,1:2])
+summary(prcomp(df, scale=TRUE))
+
+# Model selection
+low_mod002<-lm(d13~1) # empty model to use in forward model selection
+stepAIC(low_mod002,direction="forward",scope=list(upper=mod002,lower=low_mod002)) # converges on same model
+```
+
+##### Compress all enzyme activites into one PCA axis, pull out loadings for each mesocosm.
+
+```{r}
+##### This is for total respiration
+names(bog1)
+
+AG<-bog1$AG
+BG<-bog1$BG
+CBH<-bog1$CBH
+NAG<-bog1$NAG
+PHOS<-bog1$PHOS
+LAP<-bog1$LAP
+
+enzyDat<-data.frame(AG,BG,CBH,NAG,PHOS,LAP)
+
+PCA_enzy<-prcomp(enzyDat,scale=TRUE)
+enzy_loads<-data.frame(predict(PCA_enzy)) # converge to data frame so you can call out columns
+resp_PC1_orig<-enzy_loads$PC1  # enzy_loads$PC1 are the PC1 loadings for each mesocosm
+
+summary(PCA_enzy) # PC1 explains 74.45% of overall enzyme activity variation
+
+##### This is for 13C starch
+
+starch_bog<-filter(bog1,carbon=="label")
+
+AG1<-starch_bog$AG
+BG1<-starch_bog$BG
+CBH1<-starch_bog$CBH
+NAG1<-starch_bog$NAG
+PHOS1<-starch_bog$PHOS
+LAP1<-starch_bog$LAP
+
+starch_enzyDat<-data.frame(AG1,BG1,CBH1,NAG1,PHOS1,LAP1)
+
+PCA_enzy_starch<-prcomp(starch_enzyDat,scale=TRUE)
+starch_enzy_loads<-data.frame(predict(PCA_enzy_starch)) # converge to data frame so you can call out columns
+starch_PC1_orig<-starch_enzy_loads$PC1
+
+summary(PCA_enzy_starch) # PC1 explains 84.31% of overall enzyme variation
+```
