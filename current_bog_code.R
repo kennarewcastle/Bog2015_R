@@ -246,8 +246,7 @@ starch_resp<-lm(d13~resp)
 summary(starch_resp) # no, p=0.88
 qplot(x=resp,y=d13)
 
-#########################################################################################################
-##### Stats for mean bog properties table
+##### Mean bog properties table
 
 # Use full dataset that includes NAs, bog1
 bog1<-read.csv("bog_2015.csv")
@@ -306,7 +305,9 @@ bogMean<-function(dat=NULL) {
 #_________________________________________________________________
 
 tableOutput<-bogMean(dat=tableDat)
-write.csv(tableOutput,file="table_means.csv")
+write.csv(tableOutput,file="table_means.csv") # Creates a .csv file in working directory with parameters and their means and sds. This data goes into a .csv file that will be used as the skeleton for a kable table.
+
+##### Use kable to make table look pretty for manuscript.
 
 #########################################################################################################
 ######################################## SUPPLEMENTARY FIGURES ##########################################
