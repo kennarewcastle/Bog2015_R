@@ -246,7 +246,67 @@ starch_resp<-lm(d13~resp)
 summary(starch_resp) # no, p=0.88
 qplot(x=resp,y=d13)
 
-##### Is DOC vs. resp relationship significant?
+#########################################################################################################
+##### Stats for mean bog properties table
+
+# Use full dataset that includes NAs, bog1
+bog1<-read.csv("bog_2015.csv")
+names(bog1)
+
+blub<-bog1$Dist..Blueberry..m.
+spruce<-bog1$Dist..Spruce..m.
+sat<-bog1$per..saturation
+pH<-bog1$pH
+peatCN<-bog1$peat.C.N
+DOC<-bog1$DOC..mg.C.g.1.dry.soil.
+DON<-bog1$DON..mg.N.g.1.dry.soil.
+MBC<-bog1$MBC.mg.C.g.1.dry.soil
+MBN<-bog1$MBN.mg.N.g.1.dry.soil
+enzyC<-(bog1$AG + bog1$BG + bog1$CBH)
+enzyN<-(bog1$NAG + bog1$PHOS + bog1$LAP)
+
+tableDat<-data.frame(blub,spruce,sat,pH,peatCN,DOC,DON,MBC,MBN,enzyC,enzyN)
+
+#########################################################################################################
+# FUNCTION: bogMean
+# Calculates site-level mean and standard deviation of all bog properties
+# input: dat: data frame where columns are individual parameters and rows are observations across parameters for an individual mesocosm
+# output: data frame listing mean and sd for each parameter
+#--------------------------------------------------------------------------------------------------------
+
+bogMean<-function(dat=NULL) {
+  if(is.null(dat)) { # Minimalist code for default data frame to test function
+    var1<-runif(10)
+    var2<-runif(10)
+    dat<-data.frame(var1,var2)
+  }
+  
+  N<-ncol(dat)
+  
+  param<-c()
+  meanDat<-c()
+  sdDat<-c()
+  sumDat<-data.frame(param,meanDat,sdDat)
+  
+  namesDat<-names(dat)
+  
+  for(i in 1:N) {
+    meanVar<-mean(dat[,i], na.rm=TRUE) # removes NAs from a column before calculating mean
+    sdVar<-sd(dat[,i], na.rm=TRUE)
+    name<-namesDat[i]
+    
+    sumDat[i,1]<-name
+    sumDat[i,2]<-meanVar
+    sumDat[i,3]<-sdVar
+  }
+  
+  names(sumDat)<-c("Parameter","Mean","Standard Deviation")
+  return(sumDat)
+}
+#_________________________________________________________________
+
+tableOutput<-bogMean(dat=tableDat)
+write.csv(tableOutput,file="table_means.csv")
 
 #########################################################################################################
 ######################################## SUPPLEMENTARY FIGURES ##########################################
