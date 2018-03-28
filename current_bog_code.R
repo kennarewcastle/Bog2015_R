@@ -7,6 +7,8 @@ library(dplyr)
 library(MASS)
 library(stats)
 library(gridExtra)
+library(knitr)
+library(kableExtra)
 
 
 ##### Read in data and remove NAs
@@ -307,7 +309,7 @@ bogMean<-function(dat=NULL) {
 tableOutput<-bogMean(dat=tableDat)
 write.csv(tableOutput,file="table_means.csv") # Creates a .csv file in working directory with parameters and their means and sds. This data goes into a .csv file that will be used as the skeleton for a kable table.
 
-##### Use kable to make table look pretty for manuscript.
+# See markdown file --> knit to pdf for using kable to make table look pretty for manuscript.
 
 #########################################################################################################
 ######################################## SUPPLEMENTARY FIGURES ##########################################
