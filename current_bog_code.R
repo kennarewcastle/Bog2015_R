@@ -10,50 +10,74 @@ library(gridExtra)
 library(knitr)
 library(kableExtra)
 
-
-##### Read in data and remove NAs
+#########################################################################################################
+###############################              MASTER DATA FRAME               ############################
+############################### Start below to read in prepared data frames. ############################
+#########################################################################################################
 
 bog1<-read.csv("bog_2015.csv")
 bog<-filter(bog1,GWC!="NA")
-bogMBC<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
 
-
-##### Compress enzymes into a total nutrient enzyme activity parameter and a total carbon enzyme activity parameter.
+# Compress enzymes into a total nutrient enzyme activity parameter and a total carbon enzyme activity parameter.
 
 # nutrient enzymes
-NAG<-bogMBC$NAG
-PHOS<-bogMBC$PHOS
-LAP<-bogMBC$LAP 
+NAG<-bog$NAG
+PHOS<-bog$PHOS
+LAP<-bog$LAP 
 enzyNut<-NAG+PHOS+LAP
 
 # carbon enzymes
-CBH<-bogMBC$CBH
-AG<-bogMBC$AG
-BG<-bogMBC$BG
+CBH<-bog$CBH
+AG<-bog$AG
+BG<-bog$BG
 enzyC<-CBH+AG+BG
 
 # add total enzyme columns to main dataframe
-realbog1<-cbind(bogMBC,enzyNut,enzyC)
-MBC<-realbog1$MBC.mg.C.g.1.dry.soil
-realbog<-filter(realbog1,MBC>0.5) # Excludes one very clear outlier (screwed up analysis?) MBC point
+bog<-cbind(bog,enzyNut,enzyC)
 
-##### Model selection using step AIC for resp predictors.
+bog[51,31]<-NA # Excludes one very clear outlier (screwed up analysis?) MBC point
 
-resp<-realbog$D5.CO2
-MBC<-realbog$MBC.mg.C.g.1.dry.soil
-logMBC<-log(MBC) # Data is slightly more normally distributed... Not enough to matter!
-resp_enzyC<-realbog$enzyC
-resp_enzyNut<-realbog$enzyNut
-sat<-realbog$per..saturation
-pH<-realbog$pH
-DOC<-realbog$DOC..mg.C.g.1.dry.soil.
-CN<-realbog$peat.C.N
-spruce<-realbog$Dist..Spruce..m.
-blub<-realbog$Dist..Blueberry..m.
+# data frame without NAs for step AIC function
+realbog<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
+
+write.csv(bog,file="Master_BOG2015_forR.csv",row.names=FALSE)
+write.csv(realbog,file="BOG2015_for_stepAIC.csv",row.names=FALSE)
+
+#########################################################################################################
+#################################### ANALYSES FOR MANUSCRIPT BODY #######################################
+#########################################################################################################
+
+bog<-read.csv("Master_BOG2015_forR.csv")
+realbog<-read.csv("BOG2015_for_stepAIC.csv")
+
+##### Model selection using step AIC for resp predictors. These parameters are for the scenario where we include 
+
+# resp<-realbog$D5.CO2
+# MBC<-realbog$MBC.mg.C.g.1.dry.soil
+# logMBC<-log(MBC) # Data is slightly more normally distributed... Not enough to matter!
+# resp_enzyC<-realbog$enzyC
+# resp_enzyNut<-realbog$enzyNut
+# sat<-realbog$per..saturation
+# pH<-realbog$pH
+# DOC<-realbog$DOC..mg.C.g.1.dry.soil.
+# CN<-realbog$peat.C.N
+# spruce<-realbog$Dist..Spruce..m.
+# blub<-realbog$Dist..Blueberry..m.
+
+# These parameters are on the full dataset (n=59) and excludes MBC and DOC
+resp<-bog$D5.CO2
+resp_enzyC<-bog$enzyC
+resp_enzyNut<-bog$enzyNut
+sat<-bog$per..saturation
+pH<-bog$pH
+CN<-bog$peat.C.N
+spruce<-bog$Dist..Spruce..m.
+blub<-bog$Dist..Blueberry..m.
 
 # Figure out parameter order in initial model by comparing resp~paramater R2
 
-predict1<-data.frame(MBC,resp_enzyC,resp_enzyNut,sat,pH,DOC,CN,spruce,blub)
+# predict1<-data.frame(MBC,resp_enzyC,resp_enzyNut,sat,pH,DOC,CN,spruce,blub)
+predict1<-data.frame(resp_enzyC,resp_enzyNut,sat,pH,CN,spruce,blub)
 
 param_R2<-function(predict,response){
   N<-ncol(predict)
@@ -75,7 +99,8 @@ print(resp_rs)
 
 library(MASS)
 
-mod001<-lm(resp~sat+ resp_enzyNut+ MBC+ spruce+ resp_enzyC+ DOC+ pH+ blub+ CN)
+# mod001<-lm((resp~sat+ resp_enzyNut+ MBC+ spruce+ resp_enzyC+ DOC+ pH+ blub+ CN)
+mod001<-lm(resp~sat+ resp_enzyNut+ spruce+ resp_enzyC+ pH+ CN+ blub)
 stepmod001<-stepAIC(mod001, direction="both") # best model: resp ~ sat + spruce + resp_enzyC + DOC, AIC = 21.63
 summary(stepmod001)
 
@@ -156,15 +181,16 @@ grid.arrange(resp_sat_plot,resp_spruce_plot,resp_enzyC_plot,resp_DOC_plot,nrow=2
 
 ##### Model selection using step AIC for d13 predictors.
 
-bog_starch<-filter(realbog,carbon=="label")
+# bog_starch<-filter(realbog,carbon=="label")
+bog_starch<-filter(bog,carbon=="label")
 
 d13<-bog_starch$D5.d13
-MBC<-bog_starch$MBC.mg.C.g.1.dry.soil
+# MBC<-bog_starch$MBC.mg.C.g.1.dry.soil
 starch_enzyC<-bog_starch$enzyC
 starch_enzyNut<-bog_starch$enzyNut
 sat<-bog_starch$per..saturation
 pH<-bog_starch$pH
-DOC<-bog_starch$DOC..mg.C.g.1.dry.soil.
+# DOC<-bog_starch$DOC..mg.C.g.1.dry.soil.
 CN<-bog_starch$peat.C.N
 spruce<-bog_starch$Dist..Spruce..m.
 blub<-bog_starch$Dist..Blueberry..m.
@@ -172,7 +198,8 @@ resp<-bog_starch$D5.CO2
 
 # Figure out parameter order in initial model by comparing resp~paramater R2
 
-predict2<-data.frame(MBC,starch_enzyC,starch_enzyNut,sat,pH,DOC,CN,spruce,blub)
+# predict2<-data.frame(MBC,starch_enzyC,starch_enzyNut,sat,pH,DOC,CN,spruce,blub)
+predict2<-data.frame(starch_enzyC,starch_enzyNut,sat,pH,CN,spruce,blub)
 
 starch_rs<-param_R2(predict=predict2,response=d13)
 print(starch_rs)
@@ -180,8 +207,9 @@ print(starch_rs)
 # StepAIC model selection
 library(MASS)
 
-mod002<-lm(d13~spruce+ MBC+ starch_enzyC+ sat+ starch_enzyNut+ DOC+ CN+ blub+ pH)
-stepmod002<-stepAIC(mod002, direction="both") # best model: resp~ spruce+ starch_enzyC + starch_enzyNut, 
+# mod002<-lm(d13~spruce+ MBC+ starch_enzyC+ sat+ starch_enzyNut+ DOC+ CN+ blub+ pH)
+mod002<-lm(d13~spruce+ starch_enzyC+ sat+ starch_enzyNut+ CN+ pH+ blub)
+stepmod002<-stepAIC(mod002, direction="both") # best model: resp~ spruce+ starch_enzyC + starch_enzyNut 
 
 summary(stepmod002)
 
@@ -311,6 +339,7 @@ write.csv(tableOutput,file="table_means.csv") # Creates a .csv file in working d
 
 # See markdown file --> knit to pdf for using kable to make table look pretty for manuscript.
 
+
 #########################################################################################################
 ######################################## SUPPLEMENTARY FIGURES ##########################################
 #########################################################################################################
@@ -405,26 +434,26 @@ d13effect_fig<-ggplot(data=bog1,aes(x=carbon,y=d13)) +
 
 #### Starch addition treatment doesn't affect: total resp, microbial biomass, enzyme activity (all 6), peat saturation, pH
 
-names(bog1)
+bog<-read.csv("Master_BOG2015_forR.csv")
 
-carbon<-as.factor(bog1$carbon)
-resp<-bog1$D5.CO2
-MBC<-bog1$MBC.mg.C.g.1.dry.soil
-AG<-bog1$AG
-BG<-bog1$BG
-CBH<-bog1$CBH
-NAG<-bog1$NAG
-PHOS<-bog1$PHOS
-LAP<-bog1$LAP
-sat<-bog1$per..saturation
-pH<-bog1$pH
-DOC<-bog1$DOC..mg.C.g.1.dry.soil.
-CN<-bog1$peat.C.N
+carbon<-as.factor(bog$carbon)
+resp<-bog$D5.CO2
+MBC<-bog$MBC.mg.C.g.1.dry.soil
+AG<-bog$AG
+BG<-bog$BG
+CBH<-bog$CBH
+NAG<-bog$NAG
+PHOS<-bog$PHOS
+LAP<-bog$LAP
+sat<-bog$per..saturation
+pH<-bog$pH
+DOC<-bog$DOC..mg.C.g.1.dry.soil.
+CN<-bog$peat.C.N
 
 # t-tests first
-starch_resp<-t.test(formula=resp~carbon) # p = 0.6186, t = -0.50054
-starch_MBC<-t.test(formula=MBC~carbon) # p = 0.667, t = -0.43349
-starch_AG<-t.test(formula=AG~carbon) # p = 0.4964, t = 0.68441
+t.test(formula=resp~carbon) # p = 0.6186, t = -0.50054, RESPIRATION
+t.test(formula=MBC~carbon) # p = 0.667, t = -0.43349, MBC
+t.test(formula=AG~carbon) # p = 0.4964, t = 0.68441, AG
 starch_BG<-t.test(formula=BG~carbon) # p = 0.1615, t = -1.4219
 starch_CBH<-t.test(formula=CBH~carbon) # p = 0.1607, t = -1.4225
 starch_NAG<-t.test(formula=NAG~carbon) # p = 0.3001, t = 1.0463
