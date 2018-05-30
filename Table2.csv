@@ -1,0 +1,8 @@
+﻿Response,Parameter,AIC,deltaAIC,Adjusted R2
+Total Respiration,Peat Water Saturation,28.20,,0.41
+,+ Carbon Enzyme Activity,21.69,– 6.51,0.50
+,+ Distance from Spruce,20.88,– 0.81,0.51
+,+ DOC,20.55,– 0.33,0.53
+Delta 13C in Respired CO2,Distance from Spruce,190.44,,0.35
+,+ Carbon Enzyme Activity,188.06,–2.38,0.44
+,+ Nutrient Enzyme Activity,185.89,–2.17,0.51

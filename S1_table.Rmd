@@ -1,0 +1,30 @@
+---
+title: "Table S1"
+author: "Kenna Rewcastle"
+date: "5/30/2018"
+output: pdf_document
+---
+
+```{r}
+library(knitr)
+library(kableExtra)
+mytable<-read.csv("S1_table.csv")
+kable(mytable,format="latex",booktabs=T)
+```
+
+Further formatting the table, italics for t and p.
+
+\begin{tabular}{lrr}
+\toprule
+Parameter & \textit{t} & \textit{p}\\
+\midrule
+Peat Respiration & -0.63 & 0.53\\
+MBC & -0.98 & 0.33\\
+Carbon Enzyme Activity & -1.38 & 0.18\\
+Nutrient Enzyme Activity & -0.83 & 0.41\\
+pH & -0.16 & 0.87\\
+DOC & 1.30 & 0.20\\
+Peat C:N & -0.11 & 0.92\\
+Peat Water Saturation & -1.27 & 0.21\\
+\bottomrule
+\end{tabular}

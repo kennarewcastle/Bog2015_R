@@ -1,0 +1,32 @@
+---
+title: "Table 2"
+author: "Kenna Rewcastle"
+date: "5/30/2018"
+output: pdf_document
+---
+
+```{r}
+library(knitr)
+library(kableExtra)
+
+mytable<-read.csv("Table2.csv")
+kable(mytable,format="latex",booktabs=T)
+```
+
+
+Formatting table.
+
+\begin{tabular}{llrlr}
+\toprule
+\textbf{Response} & \textbf{Parameter} & \textbf{AIC} & \textbf{$\Delta$AIC} & \textbf{Adjusted $R^2$}\\
+\midrule
+Total Respiration & Peat Water Saturation & 28.20 &  & 0.41\\
+ & + Carbon Enzyme Activity & 21.69 & – 6.51 & 0.50\\
+ & + Distance from Spruce & 20.88 & – 0.81 & 0.51\\
+ & + DOC & 20.55 & – 0.33 & 0.53\\
+\midrule
+$\delta$ $^{13}$C in Respired CO$_2$ & Distance from Spruce & 190.44 &  & 0.35\\
+ & + Carbon Enzyme Activity & 188.06 & –2.38 & 0.44\\
+ & + Nutrient Enzyme Activity & 185.89 & –2.17 & 0.51\\
+\bottomrule
+\end{tabular}
