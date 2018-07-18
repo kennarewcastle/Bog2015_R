@@ -22,13 +22,11 @@ kable(mytable,format="latex",booktabs=T)
 \midrule
 Distance from nearest blueberry shrub (m) & 1.98 & 3.62\\
 Distance from nearest spruce tree (m) & 0.97 & 0.57\\
-Percent peat water saturation (\%) & 62.42 & 17.99\\
+Percent water saturation (\%) & 62.42 & 17.99\\
 pH & 3.07 & 0.12\\
 peat C:N (mass ratio) & 30.26 & 1.40\\
 Dissolved organic C (mg C g$^{-1}$ dry peat) & 2.15 & 0.40\\
-Dissolved organic N (mg N g$^{-1}$ dry peat) & 117.74 & 81.79\\
 Microbial biomass C (mg C g$^{-1}$ dry peat) & 2.28 & 0.64\\
-Microbial biomass N (mg N g$^{-1}$ dry peat) & 10.34 & 68.36\\
 Potential C enzyme activity (nmol g$^{-1}$ dry peat h$^{-1}$) & 1046.57 & 362.97\\
 Potential nutrient enzyme activity (nmol g$^{-1}$ dry peat h$^{-1}$) & 626.07 & 208.10\\
 \bottomrule

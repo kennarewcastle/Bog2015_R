@@ -20,7 +20,7 @@ Formatting table.
 \toprule
 \textbf{Response} & \textbf{Parameter} & \textbf{AIC} & \textbf{$\Delta$AIC} & \textbf{Adjusted $R^2$}\\
 \midrule
-Total Respiration & Peat Water Saturation & 28.20 &  & 0.41\\
+Total Respiration & Water Saturation & 28.20 &  & 0.41\\
  & + Carbon Enzyme Activity & 21.69 & – 6.51 & 0.50\\
  & + Distance from Spruce & 20.88 & – 0.81 & 0.51\\
  & + DOC & 20.55 & – 0.33 & 0.53\\

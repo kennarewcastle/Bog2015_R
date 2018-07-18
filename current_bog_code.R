@@ -122,8 +122,8 @@ summary(resp_sat) # p < 0.001, R2 = 0.411
 resp_sat_plot<-ggplot(data=realbog,aes(x=sat,y=resp)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
-  ylab(expression(bold(paste("Peat Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
-  xlab(label="Peat Water Saturation (%)") +
+  ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
+  xlab(label="Water Saturation (%)") +
   coord_cartesian(xlim=c(40,130), ylim=c(0,8.05)) + # Makes sure that CI and line fit extend to edge of graph
   annotate("text", x = 40, y = 7.9, label = "A", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
@@ -159,7 +159,7 @@ summary(resp_enzyC_mod)
 resp_enzyC_plot<-ggplot(data=realbog,aes(x=resp_enzyC,y=resp)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
-  ylab(expression(bold(paste("Peat Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
+  ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
   xlab(expression(bold(paste("Potential C Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,8) +
   annotate("text", x = 500, y = 7.9, label = "C", size=8, color="black") +
@@ -253,8 +253,8 @@ d13_spruce_plot<-ggplot(data=bog_starch,aes(x=spruce,y=d13)) +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=14,face="bold"),
-        axis.title.x=element_text(size=12,face="bold"),
+        axis.title.y=element_text(size=16,face="bold"),
+        axis.title.x=element_text(size=16,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -266,14 +266,14 @@ d13_enzyC_plot<-ggplot(data=bog_starch,aes(x=starch_enzyC,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("Potential C Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("C Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
   annotate("text", x = 600, y = 400, label = "B", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=14,face="bold"),
-        axis.title.x=element_text(size=12,face="bold"),
+        axis.title.y=element_text(size=16,face="bold"),
+        axis.title.x=element_text(size=16,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -285,14 +285,14 @@ d13_enzyNut_plot<-ggplot(data=bog_starch,aes(x=starch_enzyNut,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("Potential Nutrient Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("Nutrient Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
   annotate("text", x = 400, y = 400, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=14,face="bold"),
-        axis.title.x=element_text(size=12,face="bold"),
+        axis.title.y=element_text(size=16,face="bold"),
+        axis.title.x=element_text(size=16,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -418,7 +418,7 @@ mesh_scale<-c(1,2,3)
 
 mesh_sat_fig<-ggplot(data=bog,aes(x=mesh,y=sat)) +
   geom_boxplot(lwd=1.5) +
-  labs(x="Mesh Size",y="% Peat Water Saturation") +
+  labs(x="Mesh Size",y="% Water Saturation") +
   # scale_colour_manual(values=mesh_cols,labels=c("1.45 mm","55 \u03BCm","5 \u03BCm"),guide=FALSE) + 
   # weird text is unicode for mu
   annotate("text",x=3.4,y=128,label="B",size=10) +
