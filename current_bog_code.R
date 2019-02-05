@@ -10,11 +10,8 @@ library(gridExtra)
 library(knitr)
 library(kableExtra)
 
-#########################################################################################################
-###############################              MASTER DATA FRAME               ############################
-############################### Start below to read in prepared data frames. ############################
-#########################################################################################################
 
+# Master Data Frame ******SKIP THIS SECTION ***** ------------------------------------------
 bog1<-read.csv("bog_2015.csv")
 bog<-filter(bog1,GWC!="NA")
 
@@ -43,10 +40,8 @@ realbog<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
 write.csv(bog,file="Master_BOG2015_forR.csv",row.names=FALSE)
 write.csv(realbog,file="BOG2015_for_stepAIC.csv",row.names=FALSE)
 
-#########################################################################################################
-#################################### ANALYSES FOR MANUSCRIPT BODY #######################################
-#########################################################################################################
 
+# ANALYSES FOR MANUSCRIPT BODY --------------------------------------------
 bog<-read.csv("Master_BOG2015_forR.csv")
 realbog<-read.csv("BOG2015_for_stepAIC.csv")
 
@@ -372,10 +367,8 @@ write.csv(tableOutput,file="table_means.csv") # Creates a .csv file in working d
 # See markdown file --> knit to pdf for using kable to make table look pretty for manuscript.
 
 
-#########################################################################################################
-######################################## SUPPLEMENTARY FIGURES ##########################################
-#########################################################################################################
 
+# SUPPLEMENTARY FIGURES ---------------------------------------------------
 
 ##### Mesh size does not affect microbial biomass (plot and stats)
 
@@ -517,3 +510,50 @@ summary(DOC_d13)
 
 MBC_d13<-lm(d13~MBC)
 summary(MBC_d13)
+
+##### Atom percent 13CO2 across sampling days
+
+five_day_atom<-c(bog_starch$D1.13C.atom..,bog_starch$D2.13C.atom..,bog_starch$D3.13C.atom..,bog_starch$D4.13C.atom..,bog_starch$D5.13C.atom..)
+
+atom_days<-rep(1:5,each=22)
+
+atom_dat<-data.frame("Day"=atom_days,"Atom_Percent"=five_day_atom)
+atom_dat$Day<-as.factor(atom_dat$Day)
+
+# I think boxplots are the correct way to do this...
+atom_days_fig<-ggplot(data=atom_dat,aes(x=Day,y=Atom_Percent)) +
+    geom_boxplot(lwd=1) +
+    labs(y=expression(bold(paste(text=" "^{bold("13")},"C"," Atom % in ","CO"[bold(2)]))),x=expression(bold(paste(text="Days After"," "^{bold("13")},"C","-Starch Addition")))) +
+    theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+          axis.text.y=element_text(colour="black",size=10),
+          axis.text.x=element_text(colour="black",size=14),
+          axis.title=element_text(size=14,face="bold"),
+          panel.border=element_rect(fill=NA,colour="black",size=1.5),
+          panel.background=element_rect(fill=NA))
+
+atom_days_smooth<-ggplot(data=atom_dat,aes(x=as.numeric(atom_dat$Day),y=Atom_Percent)) +
+  geom_point() +
+  geom_smooth(col="black") +
+  labs(y=expression(bold(paste(text=" "^{bold("13")},"C"," Atom % in ","CO"[bold(2)]))),x=expression(bold(paste(text="Days After"," "^{bold("13")},"C","-Starch Addition")))) +
+  theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+        axis.text.y=element_text(colour="black",size=10),
+        axis.text.x=element_text(colour="black",size=14),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA))
+
+# d13_days_fig.....
+
+# Distrubtion in mesocosm proximity to spruce, blueberry
+
+Distance<-c(bog$Dist..Spruce..m.,bog$Dist..Blueberry..m.)
+Tree<-c(rep("spruce",times=59),rep("blub",times=59))
+dist_df<-data.frame("Tree"=Tree,"Distance"=Distance)
+
+ggplot(data=dist_df, aes(dist_df$Distance,fill=dist_df$Tree)) + 
+  geom_density(alpha=0.7) +
+  labs(fill="Focal plant species",x="Mesocosm distance to nearest stem (m)",y="Density") +
+  scale_fill_discrete(labels=c("spruce"="black spruce","blub"="blueberry")) +
+  theme_classic()
+
+ggsave(filename="Plant_dist.jpg")
