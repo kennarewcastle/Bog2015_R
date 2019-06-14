@@ -1,6 +1,7 @@
 ### Currrent code for bog paper analyses and figures
 ### Kenna Rewcastle
 ### March 6th, 2018
+### Revised June 14, 2019
 
 library(ggplot2)
 library(dplyr)
@@ -44,6 +45,7 @@ write.csv(realbog,file="BOG2015_for_stepAIC.csv",row.names=FALSE)
 # ANALYSES FOR MANUSCRIPT BODY --------------------------------------------
 bog<-read.csv("Master_BOG2015_forR.csv")
 realbog<-read.csv("BOG2015_for_stepAIC.csv")
+bog_starch<-filter(realbog,carbon=="label")
 
 ##### Model selection using step AIC for resp predictors. These parameters are for the scenario where we include 
 
@@ -193,7 +195,6 @@ ggsave(filename="Figure2.pdf",plot=Figure2,dpi=300,width=8.75,height=7.5,units="
 ##### Model selection using step AIC for d13 predictors.
 
 bog_starch<-filter(realbog,carbon=="label")
-# bog_starch<-filter(bog,carbon=="label")
 
 d13<-bog_starch$D5.d13
 MBC<-bog_starch$MBC.mg.C.g.1.dry.soil
@@ -542,9 +543,28 @@ atom_days_smooth<-ggplot(data=atom_dat,aes(x=as.numeric(atom_dat$Day),y=Atom_Per
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA))
 
-# d13_days_fig.....
+##### Atom percent 13CO2 across sampling days
 
-# Distrubtion in mesocosm proximity to spruce, blueberry
+five_day_d13<-c(bog_starch$D1.d13,bog_starch$D2.d13,bog_starch$D3.d13,bog_starch$D4.d13,bog_starch$D5.d13)
+
+d13_days<-rep(1:5,each=22)
+
+d13_dat<-data.frame("Day"=d13_days,"d13"=five_day_d13)
+d13_dat$Day<-as.factor(d13_dat$Day)
+
+d13_days_fig<-ggplot(data=d13_dat,aes(x=Day,y=d13)) +
+  geom_boxplot(lwd=1) +ylab(label=expression(bold(paste("\u03B4"^{bold("13")}, "C Respired (\u2030)")))) +
+  labs(y=expression(bold(paste("\u03B4"^{bold("13")}, "C Respired (\u2030)"))),x=expression(bold(paste(text="Days After"," "^{bold("13")},"C","-Starch Addition")))) +
+  theme(panel.grid.minor=element_blank(),panel.grid.major=element_blank(),
+        axis.text.y=element_text(colour="black",size=10),
+        axis.text.x=element_text(colour="black",size=14),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA))
+
+ggsave(filename="d13_5_days.jpg",plot=d13_days_fig)
+
+# Distrubtion in mesocosm proximity to spruce, blueberry ------------------
 
 Distance<-c(bog$Dist..Spruce..m.,bog$Dist..Blueberry..m.)
 Tree<-c(rep("spruce",times=59),rep("blub",times=59))
@@ -557,3 +577,31 @@ ggplot(data=dist_df, aes(dist_df$Distance,fill=dist_df$Tree)) +
   theme_classic()
 
 ggsave(filename="Plant_dist.jpg")
+
+
+
+# Is water-microbial activity relationship driven by pH? ------------------
+
+#### Water saturation vs. pH
+sat_pH<-ggplot(data=bog,aes(x=bog$per..saturation,y=bog$pH)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(expression(bold(paste("pH")))) +
+  xlab(label="Water Saturation (%)") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+sat_pH_mod<-lm(bog$pH~bog$per..saturation)
+summary(sat_pH_mod) # Significant, p =0.02575, F = 5.244
+
+resp_sat_pH<-lm(bog$D5.CO2~bog$per..saturation*bog$pH)
+summary(resp_sat_pH)
+
+resp_pH<-lm(bog$D5.CO2~bog$pH)
+summary(resp_pH)
+# While there is a negative relationship between peat saturation and pH (p =0.02575, F = 5.244), this relationship does not seem to confound the strong correlation between peat saturation and respiration, as there is no indication of an impact of pH alone (p = 0.08687, F = 3.035) or an interactive effect between pH and peat saturation on heterotrophic respiration (p = 0.983, F = 12.87).
