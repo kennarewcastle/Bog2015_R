@@ -13,33 +13,33 @@ library(kableExtra)
 
 
 # Master Data Frame ******SKIP THIS SECTION ***** ------------------------------------------
-bog1<-read.csv("bog_2015.csv")
-bog<-filter(bog1,GWC!="NA")
+#bog1<-read.csv("bog_2015.csv")
+#bog<-filter(bog1,GWC!="NA")
 
 # Compress enzymes into a total nutrient enzyme activity parameter and a total carbon enzyme activity parameter.
 
 # nutrient enzymes
-NAG<-bog$NAG
-PHOS<-bog$PHOS
-LAP<-bog$LAP 
-enzyNut<-NAG+PHOS+LAP
+#NAG<-bog$NAG
+#PHOS<-bog$PHOS
+#LAP<-bog$LAP 
+#enzyNut<-NAG+PHOS+LAP
 
 # carbon enzymes
-CBH<-bog$CBH
-AG<-bog$AG
-BG<-bog$BG
-enzyC<-CBH+AG+BG
+#CBH<-bog$CBH
+#AG<-bog$AG
+#BG<-bog$BG
+#enzyC<-CBH+AG+BG
 
 # add total enzyme columns to main dataframe
-bog<-cbind(bog,enzyNut,enzyC)
+#bog<-cbind(bog,enzyNut,enzyC)
 
-bog[51,31]<-NA # Excludes one very clear outlier (screwed up analysis?) MBC point
+#bog[51,31]<-NA # Excludes one very clear outlier (screwed up analysis?) MBC point
 
 # data frame without NAs for step AIC function
-realbog<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
+#realbog<-filter(bog,MBC.mg.C.g.1.dry.soil!="NA")
 
-write.csv(bog,file="Master_BOG2015_forR.csv",row.names=FALSE)
-write.csv(realbog,file="BOG2015_for_stepAIC.csv",row.names=FALSE)
+#write.csv(bog,file="Master_BOG2015_forR.csv",row.names=FALSE)
+#write.csv(realbog,file="BOG2015_for_stepAIC.csv",row.names=FALSE)
 
 
 # ANALYSES FOR MANUSCRIPT BODY --------------------------------------------
@@ -47,19 +47,69 @@ bog<-read.csv("Master_BOG2015_forR.csv")
 realbog<-read.csv("BOG2015_for_stepAIC.csv")
 bog_starch<-filter(realbog,carbon=="label")
 
+# Scale C and N values  ----------------
+
+# Reviewer 2 didn't like the idea of adding enzyme activities together to come up with a composite enzyme activity. To address this, I've scaled the enzyme activities so that the magnitude each of the three individual activities in the composite variable are comparable. Resp x each enzyme and d13 by each enzyme will be included in the supplemental material.
+
+
+# RESPIRATION --------------------------------------------
+resp<-bog$D5.CO2
+
+# Carbon enzymes
+bg_resp<-lm(resp~bog$BG)
+summary(bg_resp) # p = 0.003, R2 = 0.1327
+qplot(x=BG,y=D5.CO2,data=bog)
+
+ag_resp<-lm(resp~bog$AG)
+summary(ag_resp) # p = 0.990, R2 = -0.01754
+qplot(x=BG,y=D5.CO2,data=bog)
+
+cbh_resp<-lm(resp~bog$CBH)
+summary(cbh_resp) # p = 0.007 R2 = 0.1067
+qplot(x=BG,y=D5.CO2,data=bog)
+
+
+# Nutrient enzymes
+nag_resp<-lm(resp~bog$NAG) 
+summary(nag_resp) # p = 0.063 R2 = 0.042
+qplot(bog$NAG,resp)
+
+phos_resp<-lm(resp~bog$PHOS)
+summary(phos_resp) # p = 0.0001 R2 = 0.2157
+qplot(bog$PHOS,resp)
+
+lap_resp<-lm(resp~bog$LAP)
+summary(lap_resp) # p = 0.0007938 R2 = 0.1662
+qplot(bog$LAP,resp)
+
 ##### Model selection using step AIC for resp predictors. These parameters are for the scenario where we include 
 
 resp<-realbog$D5.CO2
 MBC<-realbog$MBC.mg.C.g.1.dry.soil
 # logMBC<-log(MBC) # Data is slightly more normally distributed... Not enough to matter!
-resp_enzyC<-realbog$enzyC
-resp_enzyNut<-realbog$enzyNut
+# resp_enzyC<-realbog$enzyC
+# resp_enzyNut<-realbog$enzyNut
 sat<-realbog$per..saturation
 pH<-realbog$pH
 DOC<-realbog$DOC..mg.C.g.1.dry.soil.
 CN<-realbog$peat.C.N
 spruce<-realbog$Dist..Spruce..m.
 blub<-realbog$Dist..Blueberry..m.
+
+enzy_C_scale<-data.frame("AG_scale"=realbog$AG,"BG_scale"=realbog$BG,"CBH_scale"=realbog$CBH)
+enzy_C_scale<-scale(enzy_C_scale,center=FALSE,scale=TRUE)
+sum_C_scale<-enzy_C_scale[,1] + enzy_C_scale[,2] + enzy_C_scale[,3]
+
+enzy_nut_scale<-data.frame("NAG_scale"=realbog$NAG,"PHOS_scale"=realbog$PHOS,"LAP_scale"=realbog$LAP)
+enzy_nut_scale<-scale(enzy_nut_scale,center=FALSE,scale=TRUE)
+sum_nut_scale<-enzy_nut_scale[,1] + enzy_nut_scale[,2] + enzy_nut_scale[,3]
+
+AG<-realbog$AG
+BG<-realbog$BG
+CBH<-realbog$CBH
+NAG<-realbog$NAG
+LAP<-realbog$LAP
+PHOS<-realbog$PHOS
 
 # These parameters are on the full dataset (n=59) and excludes MBC and DOC
 # resp<-bog$D5.CO2
@@ -74,7 +124,8 @@ blub<-realbog$Dist..Blueberry..m.
 # Figure out parameter order in initial model by comparing resp~paramater R2
 
 # predict1<-data.frame(MBC,resp_enzyC,resp_enzyNut,sat,pH,DOC,CN,spruce,blub)
-predict1<-data.frame(resp_enzyC,resp_enzyNut,sat,pH,CN,spruce,blub,MBC,DOC)
+# predict1<-data.frame(sum_C_scale,sum_nut_scale,sat,pH,CN,spruce,blub,MBC,DOC)
+predict1<-data.frame(AG,BG,CBH,NAG,PHOS,LAP,sat,pH,CN,spruce,blub,MBC,DOC)
 
 param_R2<-function(predict,response){
   N<-ncol(predict)
@@ -96,19 +147,19 @@ print(resp_rs)
 
 library(MASS)
 
-mod001<-lm(resp~sat+ resp_enzyNut+ MBC+ spruce+ resp_enzyC+ DOC+ pH+ blub+ CN)
+mod001<-lm(resp~sat+ PHOS+ LAP+ MBC+ BG+ spruce+ CBH+ NAG+ DOC+ pH+ blub+ CN+ AG)
 # mod001<-lm(resp~sat+ resp_enzyNut+ spruce+ resp_enzyC+ pH+ CN+ blub)
 startmod<-lm(resp~1)
-stepmod001<-stepAIC(startmod,direction="both",scope=resp~sat+ resp_enzyNut+ MBC+ spruce+ resp_enzyC+ DOC+ pH+ blub+ CN)# best model: resp ~ sat + spruce + resp_enzyC + DOC, AIC = 21.63
- summary(stepmod001)
+stepmod001<-stepAIC(startmod,direction="both",scope=resp~sat+ PHOS+ LAP+ MBC+ BG+ spruce+ CBH+ NAG+ DOC+ pH+ blub+ CN+ AG) # best model: resp ~ sat + BG + spruce + DOC, AIC = 19.5
+summary(stepmod001)
 
 mod1<-lm(resp~sat)
 summary(mod1)
-mod2<-lm(resp~sat+resp_enzyC)
+mod2<-lm(resp~sat+BG)
 summary(mod2)
-mod3<-lm(resp~sat+resp_enzyC+spruce)
+mod3<-lm(resp~sat+BG+spruce)
 summary(mod3)
-mod4<-lm(resp~sat+resp_enzyC+spruce+DOC)
+mod4<-lm(resp~sat+BG+spruce+DOC)
 summary(mod4)
 
 ##### Linear regressions between parameters in best fit model and resp
@@ -150,16 +201,16 @@ resp_spruce_plot<-ggplot(data=realbog,aes(x=spruce,y=resp)) +
         panel.background=element_rect(fill=NA)
   )
 
-resp_enzyC_mod<-lm(resp~resp_enzyC) # p = 0.010, R2 = 0.12
-summary(resp_enzyC_mod)
+resp_BG_mod<-lm(resp~BG) # p = 0.007, R2 = 0.129
+summary(resp_BG_mod)
 
-resp_enzyC_plot<-ggplot(data=realbog,aes(x=resp_enzyC,y=resp)) +
+resp_BG_plot<-ggplot(data=realbog,aes(x=BG,y=resp)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
-  xlab(expression(bold(paste("Potential C Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,8) +
-  annotate("text", x = 500, y = 7.9, label = "C", size=8, color="black") +
+  annotate("text", x = 1750, y = 7.9, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
@@ -189,7 +240,7 @@ resp_DOC_plot<-ggplot(data=realbog,aes(x=DOC,y=resp)) +
 ##### Panneled figure for best predictor regressions
 
 library(gridExtra)
-Figure2<-grid.arrange(resp_sat_plot,resp_spruce_plot,resp_enzyC_plot,resp_DOC_plot,nrow=2)
+Figure2<-grid.arrange(resp_sat_plot,resp_spruce_plot,resp_BG_plot,resp_DOC_plot,nrow=2)
 ggsave(filename="Figure2.pdf",plot=Figure2,dpi=300,width=8.75,height=7.5,units="in")
 
 ##### Model selection using step AIC for d13 predictors.
@@ -207,10 +258,25 @@ CN<-bog_starch$peat.C.N
 spruce<-bog_starch$Dist..Spruce..m.
 blub<-bog_starch$Dist..Blueberry..m.
 resp<-bog_starch$D5.CO2
+AG<-bog_starch$AG
+BG<-bog_starch$BG
+CBH<-bog_starch$CBH
+NAG<-bog_starch$NAG
+PHOS<-bog_starch$PHOS
+LAP<-bog_starch$LAP
+
+# Scale enzyme parameters
+enzy_C_scale<-data.frame("AG_scale"=bog_starch$AG,"BG_scale"=bog_starch$BG,"CBH_scale"=bog_starch$CBH)
+enzy_C_scale<-scale(enzy_C_scale,center=FALSE,scale=TRUE)
+sum_C_scale<-enzy_C_scale[,1] + enzy_C_scale[,2] + enzy_C_scale[,3]
+
+enzy_nut_scale<-data.frame("NAG_scale"=bog_starch$NAG,"PHOS_scale"=bog_starch$PHOS,"LAP_scale"=bog_starch$LAP)
+enzy_nut_scale<-scale(enzy_nut_scale,center=FALSE,scale=TRUE)
+sum_nut_scale<-enzy_nut_scale[,1] + enzy_nut_scale[,2] + enzy_nut_scale[,3]
 
 # Figure out parameter order in initial model by comparing resp~paramater R2
 
-predict2<-data.frame(MBC,starch_enzyC,starch_enzyNut,sat,pH,DOC,CN,spruce,blub)
+predict2<-data.frame(MBC,AG,BG,CBH,NAG,LAP,PHOS,sat,pH,DOC,CN,spruce,blub)
 # predict2<-data.frame(starch_enzyC,starch_enzyNut,sat,pH,CN,spruce,blub)
 
 starch_rs<-param_R2(predict=predict2,response=d13)
@@ -219,18 +285,18 @@ print(starch_rs)
 # StepAIC model selection
 library(MASS)
 
-mod002<-lm(d13~spruce+ MBC+ starch_enzyC+ sat+ starch_enzyNut+ DOC+ CN+ blub+ pH)
+mod002<-lm(d13~spruce+ MBC+ BG+ CBH+ sat+ LAP+ PHOS+ AG+ NAG+ DOC+ CN+ blub+ pH)
 # mod002<-lm(d13~spruce+ starch_enzyC+ sat+ starch_enzyNut+ CN+ pH+ blub)
 # Best model: resp~ spruce+ starch_enzyC + starch_enzyNut 
 startmod<-lm(d13~1)
-stepmod002<-stepAIC(startmod,direction="both",scope=d13~spruce+ MBC+ starch_enzyC+ sat+ starch_enzyNut+ DOC+ CN+ blub+ pH)
-summary(stepmod002)
+stepmod002<-stepAIC(startmod,direction="both",scope=d13~spruce+ MBC+ BG+ CBH+ sat+ LAP+ PHOS+ AG+ NAG+ DOC+ CN+ blub+ pH)
+summary(stepmod002) # best model = spruce + BG + PHOS
 
 mod01<-lm(d13~spruce)
 summary(mod01)
-mod02<-lm(d13~spruce+ starch_enzyC)
+mod02<-lm(d13~spruce+ BG)
 summary(mod02)
-mod03<-lm(d13~spruce + starch_enzyC + starch_enzyNut)
+mod03<-lm(d13~spruce + BG + PHOS)
 summary(mod03)
 
 ##### Linear regressions between parameters in best fit model and d13
@@ -245,7 +311,7 @@ d13_spruce_plot<-ggplot(data=bog_starch,aes(x=spruce,y=d13)) +
   xlab(label="Distance from Nearest Spruce Tree (m)") +
   ylim(0,400) +
   xlim(0,2.45) +
-  annotate("text", x = 0, y = 400, label = "A", size=8, color="black") +
+  annotate("text", x = 0, y = 395, label = "A", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
@@ -255,16 +321,16 @@ d13_spruce_plot<-ggplot(data=bog_starch,aes(x=spruce,y=d13)) +
         panel.background=element_rect(fill=NA)
   )
 
-d13_enzyC<-lm(d13~starch_enzyC) # p = 0.014, R2 = 0.23
-summary(d13_enzyC)
+d13_BG<-lm(d13~BG) # p = 0.010, R2 = 0.2515
+summary(d13_BG)
 
-d13_enzyC_plot<-ggplot(data=bog_starch,aes(x=starch_enzyC,y=d13)) +
+d13_BG_plot<-ggplot(data=bog_starch,aes(x=BG,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("C Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
-  annotate("text", x = 600, y = 400, label = "B", size=8, color="black") +
+  annotate("text", x = 1750, y = 395, label = "B", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
@@ -274,16 +340,16 @@ d13_enzyC_plot<-ggplot(data=bog_starch,aes(x=starch_enzyC,y=d13)) +
         panel.background=element_rect(fill=NA)
   )
 
-d13_enzyNut<-lm(d13~starch_enzyNut) # p = 0.053, R2 = 0.1332
-summary(d13_enzyNut)
+d13_PHOS<-lm(d13~PHOS) # p = 0.04807, R2 = 0.1405
+summary(d13_PHOS)
 
-d13_enzyNut_plot<-ggplot(data=bog_starch,aes(x=starch_enzyNut,y=d13)) +
+d13_PHOS_plot<-ggplot(data=bog_starch,aes(x=PHOS,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("Nutrient Enzyme Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("Potential PHOS Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
-  annotate("text", x = 400, y = 400, label = "C", size=8, color="black") +
+  annotate("text", x = 1210, y = 395, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
@@ -296,7 +362,7 @@ d13_enzyNut_plot<-ggplot(data=bog_starch,aes(x=starch_enzyNut,y=d13)) +
 ##### Panneled figure for best predictor regressions
 
 library(gridExtra)
-Figure1<-grid.arrange(d13_spruce_plot,d13_enzyC_plot,d13_enzyNut_plot,nrow=1)
+Figure1<-grid.arrange(d13_spruce_plot,d13_BG_plot,d13_PHOS_plot,nrow=1)
 # ggsave(filename="Figure1.jpeg",plot=Figure1,dpi=300,width=11,units="in")
 
 ###### Does respiration predict d13?
