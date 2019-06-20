@@ -341,7 +341,7 @@ d13_BG_plot<-ggplot(data=bog_starch,aes(x=BG,y=d13)) +
         panel.background=element_rect(fill=NA)
   )
 
-d13_PHOS<-lm(d13~PHOS) # p = 0.04807, R2 = 0.1405
+d13_PHOS<-lm(d13~PHOS) # p = 0.048, R2 = 0.14
 summary(d13_PHOS)
 
 d13_PHOS_plot<-ggplot(data=bog_starch,aes(x=PHOS,y=d13)) +
