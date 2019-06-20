@@ -170,7 +170,7 @@ summary(resp_sat) # p < 0.001, R2 = 0.411
 resp_sat_plot<-ggplot(data=realbog,aes(x=sat,y=resp)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
-  ylim(0,8) +
+  ylim(0,8.1) +
   ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
   xlab(label="Water Saturation (%)") +
   coord_cartesian(xlim=c(40,130), ylim=c(0,8.05)) + # Makes sure that CI and line fit extend to edge of graph
@@ -191,7 +191,7 @@ resp_spruce_plot<-ggplot(data=realbog,aes(x=spruce,y=resp)) +
   geom_point() +
   ylab(label=NULL) +
   xlab(label="Distance from Nearest Spruce Tree (m)") +
-  ylim(0,8) +
+  ylim(0,8.1) +
   xlim(0,2.45) +
   annotate("text", x = 0, y = 7.9, label = "B", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
@@ -210,7 +210,7 @@ resp_BG_plot<-ggplot(data=realbog,aes(x=BG,y=resp)) +
   geom_point() +
   ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
   xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
-  ylim(0,8) +
+  ylim(0,8.1) +
   annotate("text", x = 1750, y = 7.9, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
