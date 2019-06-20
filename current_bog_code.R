@@ -170,6 +170,7 @@ summary(resp_sat) # p < 0.001, R2 = 0.411
 resp_sat_plot<-ggplot(data=realbog,aes(x=sat,y=resp)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
+  ylim(0,8) +
   ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
   xlab(label="Water Saturation (%)") +
   coord_cartesian(xlim=c(40,130), ylim=c(0,8.05)) + # Makes sure that CI and line fit extend to edge of graph
