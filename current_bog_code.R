@@ -544,24 +544,23 @@ sat<-bog$per..saturation
 pH<-bog$pH
 DOC<-bog$DOC..mg.C.g.1.dry.soil.
 CN<-bog$peat.C.N
-enzyC<-bog$enzyC
-enzyNut<-bog$enzyNut
+
 
 # t-tests first
-t.test(formula=resp~carbon) # p = 0.6186, t = -0.50054, RESPIRATION
-t.test(formula=MBC~carbon) # p = 0.667, t = -0.43349, MBC
-t.test(formula=AG~carbon) # p = 0.4964, t = 0.68441, AG
-starch_BG<-t.test(formula=BG~carbon) # p = 0.1615, t = -1.4219
-starch_CBH<-t.test(formula=CBH~carbon) # p = 0.1607, t = -1.4225
-starch_NAG<-t.test(formula=NAG~carbon) # p = 0.3001, t = 1.0463
-starch_PHOS<-t.test(formula=PHOS~carbon) # p = 0.166, t = -1.4057
-starch_LAP<-t.test(formula=LAP~carbon) # p = 0.6616, t = -0.44
+t.test(formula=resp~carbon) # t = -0.63, p = 0.53
+t.test(formula=MBC~carbon) # t = -0.98, p = 0.33
+t.test(formula=AG~carbon) # t = 0.43, p = 0.67
+t.test(formula=BG~carbon) # check output summary below for t and p values
+t.test(formula=CBH~carbon) 
+t.test(formula=NAG~carbon) 
+t.test(formula=PHOS~carbon) 
+t.test(formula=LAP~carbon) 
 starch_enzyC<-t.test(formula=enzyC~carbon)
 starch_enzyNut<-t.test(formula=enzyNut~carbon)
-starch_sat<-t.test(formula=sat~carbon) # p = 0.2097, t = -1.2694 
-starch_pH<-t.test(formula=pH~carbon) # p = 0.8739, t = -0.15945
-starch_DOC<-t.test(formula=DOC~carbon) # p = 0.2034, t = 1.2964
-starch_CN<-t.test(formula=CN~carbon) # p = 0.9167, t = -0.10508
+starch_sat<-t.test(formula=sat~carbon)  
+starch_pH<-t.test(formula=pH~carbon) 
+starch_DOC<-t.test(formula=DOC~carbon) 
+starch_CN<-t.test(formula=CN~carbon) 
 
 # MIGHT need to build a supplemental figure displaying all of this
 
