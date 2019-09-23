@@ -10,6 +10,7 @@ library(stats)
 library(gridExtra)
 library(knitr)
 library(kableExtra)
+library(MuMIn)
 
 
 # Master Data Frame ******SKIP THIS SECTION ***** ------------------------------------------
@@ -155,12 +156,16 @@ summary(stepmod001)
 
 mod1<-lm(resp~sat)
 summary(mod1)
+AIC(mod1)
 mod2<-lm(resp~sat+BG)
 summary(mod2)
+AIC(mod2)
 mod3<-lm(resp~sat+BG+spruce)
 summary(mod3)
+AIC(mod3)
 mod4<-lm(resp~sat+BG+spruce+DOC)
 summary(mod4)
+AIC(mod4)
 
 ##### Linear regressions between parameters in best fit model and resp
 
@@ -178,7 +183,7 @@ resp_sat_plot<-ggplot(data=realbog,aes(x=sat,y=resp)) +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title=element_text(size=14,face="bold"),
+        axis.title=element_text(size=12,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -197,7 +202,7 @@ resp_spruce_plot<-ggplot(data=realbog,aes(x=spruce,y=resp)) +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title=element_text(size=14,face="bold"),
+        axis.title=element_text(size=12,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -211,11 +216,11 @@ resp_BG_plot<-ggplot(data=realbog,aes(x=BG,y=resp)) +
   ylab(expression(bold(paste("Total Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
   xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,8.1) +
-  annotate("text", x = 1750, y = 7.9, label = "C", size=8, color="black") +
+  annotate("text", x = 10, y = 7.9, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title=element_text(size=14,face="bold"),
+        axis.title=element_text(size=12,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -233,7 +238,7 @@ resp_DOC_plot<-ggplot(data=realbog,aes(x=DOC,y=resp)) +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title=element_text(size=14,face="bold"),
+        axis.title=element_text(size=12,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -295,10 +300,14 @@ summary(stepmod002) # best model = spruce + BG + PHOS
 
 mod01<-lm(d13~spruce)
 summary(mod01)
+AIC(mod01)
 mod02<-lm(d13~spruce+ BG)
 summary(mod02)
+AIC(mod02)
 mod03<-lm(d13~spruce + BG + PHOS)
 summary(mod03)
+AIC(mod03)
+
 
 ##### Linear regressions between parameters in best fit model and d13
 
@@ -309,15 +318,15 @@ d13_spruce_plot<-ggplot(data=bog_starch,aes(x=spruce,y=d13)) +
   geom_smooth(method=lm,formula=y~x,fullrange=TRUE,colour="black",size=1.25) +
   geom_point() +
   ylab(label=expression(bold(paste("\u03B4"^{bold("13")}, "C Respired (\u2030)")))) +
-  xlab(label="Distance from Nearest Spruce Tree (m)") +
+  xlab(label="Distance to Nearest Spruce Tree (m)") +
   ylim(0,400) +
   xlim(0,2.45) +
-  annotate("text", x = 0, y = 395, label = "A", size=8, color="black") +
+  annotate("text", x = 0.05, y = 397, label = "A", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=16,face="bold"),
-        axis.title.x=element_text(size=16,face="bold"),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -329,14 +338,14 @@ d13_BG_plot<-ggplot(data=bog_starch,aes(x=BG,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
-  annotate("text", x = 1750, y = 395, label = "B", size=8, color="black") +
+  annotate("text", x = 1750, y = 397, label = "B", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=16,face="bold"),
-        axis.title.x=element_text(size=16,face="bold"),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
@@ -348,16 +357,17 @@ d13_PHOS_plot<-ggplot(data=bog_starch,aes(x=PHOS,y=d13)) +
   geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
   geom_point() +
   ylab(label=NULL) +
-  xlab(expression(bold(paste("Potential PHOS Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  xlab(expression(bold(paste("AP Activity"," (nmol"," g"^-1," h"^-1,")")))) +
   ylim(0,400) +
-  annotate("text", x = 1210, y = 395, label = "C", size=8, color="black") +
+  annotate("text", x = 1205, y = 397, label = "C", size=8, color="black") +
   theme(panel.grid.minor=element_blank(),
         panel.grid.major=element_blank(),
         axis.text=element_text(colour="black",size=10),
-        axis.title.y=element_text(size=16,face="bold"),
-        axis.title.x=element_text(size=16,face="bold"),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
-        panel.background=element_rect(fill=NA)
+        panel.background=element_rect(fill=NA),
+        plot.margin=unit(c(0.1,0.5,0.1,0.1),"cm")
   )
 
 ##### Panneled figure for best predictor regressions
@@ -373,23 +383,25 @@ qplot(x=resp,y=d13)
 
 ##### Mean bog properties table
 
-# Use full dataset that includes NAs, bog1
-bog1<-read.csv("bog_2015.csv")
-names(bog1)
+# Use full dataset that includes NAs, "bog"
+blub<-bog$Dist..Blueberry..m.
+spruce<-bog$Dist..Spruce..m.
+sat<-bog$per..saturation
+pH<-bog$pH
+peatCN<-bog$peat.C.N
+DOC<-bog$DOC..mg.C.g.1.dry.soil.
+DON<-bog$DON..mg.N.g.1.dry.soil.
+MBC<-bog$MBC.mg.C.g.1.dry.soil
+MBN<-bog$MBN.mg.N.g.1.dry.soil
+AG<-bog$AG
+BG<-bog$BG
+CBH<-bog$CBH
+NAG<-bog$NAG
+PHOS<-bog$PHOS
+LAP<-bog$LAP
 
-blub<-bog1$Dist..Blueberry..m.
-spruce<-bog1$Dist..Spruce..m.
-sat<-bog1$per..saturation
-pH<-bog1$pH
-peatCN<-bog1$peat.C.N
-DOC<-bog1$DOC..mg.C.g.1.dry.soil.
-DON<-bog1$DON..mg.N.g.1.dry.soil.
-MBC<-bog1$MBC.mg.C.g.1.dry.soil
-MBN<-bog1$MBN.mg.N.g.1.dry.soil
-enzyC<-(bog1$AG + bog1$BG + bog1$CBH)
-enzyN<-(bog1$NAG + bog1$PHOS + bog1$LAP)
 
-tableDat<-data.frame(blub,spruce,sat,pH,peatCN,DOC,DON,MBC,MBN,enzyC,enzyN)
+tableDat<-data.frame(blub,spruce,sat,pH,peatCN,DOC,DON,MBC,MBN,AG,BG,CBH,NAG,PHOS,LAP)
 
 #########################################################################################################
 # FUNCTION: bogMean
@@ -671,3 +683,300 @@ summary(resp_sat_pH)
 resp_pH<-lm(bog$D5.CO2~bog$pH)
 summary(resp_pH)
 # While there is a negative relationship between peat saturation and pH (p =0.02575, F = 5.244), this relationship does not seem to confound the strong correlation between peat saturation and respiration, as there is no indication of an impact of pH alone (p = 0.08687, F = 3.035) or an interactive effect between pH and peat saturation on heterotrophic respiration (p = 0.983, F = 12.87).
+
+
+# Peat Temperature Table (S2) ---------------------------------------------
+D1<-c(10.3,10.9,11.1,6.6,9.1)
+D2<-c(10.5,11.5,8.2,10.1,9.6)
+D3<-c(7.3,7.7,5.9,6.7,7.4)
+D5<-c(11.4,14.5,11.2,10.3,11.0)
+
+mins<-c(min(D1),min(D2),min(D3),min(D5))
+maxs<-c(max(D1),max(D2),max(D3),max(D5))
+medians<-c(median(D1),median(D2),median(D3),median(D5))
+
+peat_temp<-data.frame("day"=c("1","2","3","5"),"min"=mins,"max"=maxs,"range"=maxs-mins,"median"=medians)
+
+write.csv(peat_temp,"Peat_Temperature_S2.csv",row.names=FALSE)
+
+
+# Proximity to spruce trees x peat moisture content -----------------------
+
+bog<-read.csv("Master_BOG2015_forR.csv")
+spruce<-bog$Dist..Spruce..m.
+sat<-bog$per..saturation
+
+spruce_sat_mod<-lm(sat~spruce)
+summary(spruce_sat_mod) #  p = 0.0429, R2 = 0.054, correlation coef = 8.35
+
+spruce_sat<-ggplot(data=bog,aes(x=bog$Dist..Spruce..m.,y=bog$per..saturation)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(expression(bold(paste("Water Saturation (%)")))) +
+  xlab(label="Distance from Nearest Spruce Tree (m)") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA),
+        plot.margin=unit(c(0.5,1,0.5,0.5),"cm")
+  )
+
+
+ggsave("Figure_S3.pdf",plot=spruce_sat,dpi=300)
+
+
+# Figure S4, 13C by each of six enzymes -----------------------------------
+realbog<-read.csv("BOG2015_for_stepAIC.csv")
+bog_starch<-filter(realbog,carbon=="label")
+
+d13<-bog_starch$D5.d13
+AG<-bog_starch$AG
+BG<-bog_starch$BG
+CBH<-bog_starch$CBH
+NAG<-bog_starch$NAG
+PHOS<-bog_starch$PHOS
+LAP<-bog_starch$LAP
+
+d13_AG<-lm(d13~AG) # p = 0.054, R2 = 0.1313, coefficient = 4.09
+summary(d13_AG)
+
+d13_AG_plot<-ggplot(data=bog_starch,aes(x=AG,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=expression(bold(paste("\u03B4"^{bold("13")}, "C Respired (\u2030)")))) +
+  xlab(expression(bold(paste("AG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 12, y = 390, label = "A", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+d13_BG<-lm(d13~BG) # p = 0.010, R2 = 0.2515, coefficient = 0.160
+summary(d13_BG)
+
+d13_BG_plot<-ggplot(data=bog_starch,aes(x=BG,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 340, y = 390, label = "B", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+d13_CBH<-lm(d13~CBH) # p = 0.025, R2 = 0.1899, coefficient = 0.247
+summary(d13_CBH)
+
+d13_CBH_plot<-ggplot(data=bog_starch,aes(x=CBH,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("CBH Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 274, y = 390, label = "C", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+d13_NAG<-lm(d13~NAG) # p = 0.135, R2 = 0.064, coefficient = 0.4185
+summary(d13_NAG)
+
+d13_NAG_plot<-ggplot(data=bog_starch,aes(x=NAG,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=expression(bold(paste("\u03B4"^{bold("13")}, "C Respired (\u2030)")))) +
+  xlab(expression(bold(paste("NAG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 78, y = 390, label = "D", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+d13_PHOS<-lm(d13~PHOS) # p = 0.048, R2 = 0.1405, coefficient = 0.187
+summary(d13_PHOS)
+
+d13_PHOS_plot<-ggplot(data=bog_starch,aes(x=PHOS,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("PHOS Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 285, y = 390, label = "E", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+d13_LAP<-lm(d13~LAP) # p = 0.040, R2 = 0.1543, coefficient = 3.427
+summary(d13_LAP)
+
+d13_LAP_plot<-ggplot(data=bog_starch,aes(x=LAP,y=d13)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("LAP Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,400) +
+  annotate("text", x = 19, y = 390, label = "F", size=8, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title.y=element_text(size=14,face="bold"),
+        axis.title.x=element_text(size=14,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+library(gridExtra)
+quartz()
+FigureS4<-grid.arrange(d13_AG_plot,d13_BG_plot,d13_CBH_plot,d13_NAG_plot,d13_PHOS_plot,d13_LAP_plot,nrow=2)
+
+
+# Figure S5, respiration. x 6 enzyme activities ---------------------------
+realbog<-read.csv("BOG2015_for_stepAIC.csv")
+
+resp<-realbog$D5.CO2
+AG<-realbog$AG
+BG<-realbog$BG
+CBH<-realbog$CBH
+NAG<-realbog$NAG
+PHOS<-realbog$PHOS
+LAP<-realbog$LAP
+
+resp_AG_mod<-lm(resp~AG) # p = 0.939, R2 = -0.022, coefficient = -0.002
+summary(resp_AG_mod)
+
+resp_AG_plot<-ggplot(data=realbog,aes(x=AG,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=" ") +
+  xlab(expression(bold(paste("Potential AG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 5, y = 8, label = "A", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+resp_BG_mod<-lm(resp~BG) # p = 0.007, R2 = 0.129,  coefficient = 0.003
+summary(resp_BG_mod)
+
+resp_BG_plot<-ggplot(data=realbog,aes(x=BG,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("Potential BG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 330, y = 8, label = "B", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+resp_CBH_mod<-lm(resp~CBH) # p = 0.016, R2 = 0.100,  coefficient = 0.004
+summary(resp_CBH_mod)
+
+resp_CBH_plot<-ggplot(data=realbog,aes(x=CBH,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("Potential CBH Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 108, y = 8, label = "C", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+resp_NAG_mod<-lm(resp~NAG) # p = 0.061, R2 = 0.054, coefficient = 0.008
+summary(resp_NAG_mod)
+
+resp_NAG_plot<-ggplot(data=realbog,aes(x=NAG,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(expression(bold(paste("Heterotrophic Respiration (",mu,"mol"," ","CO"[2]," ","m"^-2," s"^-1,")")))) +
+  xlab(expression(bold(paste("Potential NAG Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 69, y = 8, label = "D", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+resp_PHOS_mod<-lm(resp~PHOS) # p = 0.001, R2 = 0.211,  coefficient = 0.005
+summary(resp_PHOS_mod)
+
+resp_PHOS_plot<-ggplot(data=realbog,aes(x=PHOS,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("Potential PHOS Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 249, y = 8, label = "E", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+resp_LAP_mod<-lm(resp~LAP) # p = 0.001, R2 = 0.187,  coefficient = 0.081
+summary(resp_LAP_mod)
+
+resp_LAP_plot<-ggplot(data=realbog,aes(x=LAP,y=resp)) +
+  geom_smooth(method=lm,formula=y~x,colour="black",size=1.25) +
+  geom_point() +
+  ylab(label=NULL) +
+  xlab(expression(bold(paste("Potential LAP Activity"," (nmol"," g"^-1," h"^-1,")")))) +
+  ylim(0,8.1) +
+  annotate("text", x = 15, y = 8, label = "F", size=6, color="black") +
+  theme(panel.grid.minor=element_blank(),
+        panel.grid.major=element_blank(),
+        axis.text=element_text(colour="black",size=10),
+        axis.title=element_text(size=12,face="bold"),
+        panel.border=element_rect(fill=NA,colour="black",size=1.5),
+        panel.background=element_rect(fill=NA)
+  )
+
+library(gridExtra)
+quartz()
+FigureS5<-grid.arrange(resp_AG_plot,resp_BG_plot,resp_CBH_plot,resp_NAG_plot,resp_PHOS_plot,resp_LAP_plot,nrow=2)
