@@ -188,6 +188,11 @@ resp_sat_plot<-ggplot(data=realbog,aes(x=sat,y=resp)) +
         panel.background=element_rect(fill=NA)
   )
 
+### Saving Figure 3A as .svg file so journal can format figure for publication
+library(svglite)
+ggsave(filename="SVG Figures for Pedosphere/Figure3_A.svg",plot=resp_sat_plot,device="svg")
+ggsave(filename="Figure3_A.pdf",plot=resp_sat_plot,device="pdf")
+
 resp_spruce<-lm(resp~spruce)
 summary(resp_spruce) # p = 0.007, R2 = 0.13
 
@@ -207,6 +212,11 @@ resp_spruce_plot<-ggplot(data=realbog,aes(x=spruce,y=resp)) +
         panel.background=element_rect(fill=NA)
   )
 
+### Saving Figure 3B as .svg file so journal can format figure for publication
+#ggsave(filename="SVG Figures for Pedosphere/Figure3_B.svg",plot=resp_spruce_plot,device="svg")
+#ggsave(filename="Figure3_B.pdf",plot=resp_spruce_plot,device="pdf")
+
+
 resp_BG_mod<-lm(resp~BG) # p = 0.007, R2 = 0.129
 summary(resp_BG_mod)
 
@@ -224,6 +234,10 @@ resp_BG_plot<-ggplot(data=realbog,aes(x=BG,y=resp)) +
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
+
+### Saving Figure 3C as .svg file so journal can format figure for publication
+#ggsave(filename="SVG Figures for Pedosphere/Figure3_C.svg",plot=resp_BG_plot,device="svg")
+#ggsave(filename="Figure3_C.pdf",plot=resp_BG_plot,device="pdf")
 
 resp_DOC<-lm(resp~DOC) # p = 0.16, R2 = 0.022
 summary(resp_DOC)
@@ -243,10 +257,15 @@ resp_DOC_plot<-ggplot(data=realbog,aes(x=DOC,y=resp)) +
         panel.background=element_rect(fill=NA)
   )
 
+### Saving Figure 3D as .svg file so journal can format figure for publication
+#ggsave(filename="SVG Figures for Pedosphere/Figure3_D.svg",plot=resp_DOC_plot,device="svg")
+#ggsave(filename="Figure3_D.pdf",plot=resp_DOC_plot,device="pdf")
+
+
 ##### Panneled figure for best predictor regressions
 
 library(gridExtra)
-Figure2<-grid.arrange(resp_sat_plot,resp_spruce_plot,resp_BG_plot,resp_DOC_plot,nrow=2)
+Figure3<-grid.arrange(resp_sat_plot,resp_spruce_plot,resp_BG_plot,resp_DOC_plot,nrow=2)
 ggsave(filename="Figure2.pdf",plot=Figure2,dpi=300,width=8.75,height=7.5,units="in")
 
 ##### Model selection using step AIC for d13 predictors.
@@ -330,6 +349,10 @@ d13_spruce_plot<-ggplot(data=bog_starch,aes(x=spruce,y=d13)) +
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA)
   )
+
+### Saving Figure 2A as .svg file so journal can format figure for publication
+ggsave(filename="SVG Figures for Pedosphere/Figure2_A.svg",plot=d13_spruce_plot,device="svg")
+ggsave(filename="Figure2_A.jpeg",plot=d13_spruce_plot,device="jpeg") # .jpeg to correctly convert symbols for delta/per mil
 
 d13_BG<-lm(d13~BG) # p = 0.010, R2 = 0.2515
 summary(d13_BG)
@@ -640,7 +663,9 @@ d13_days_fig<-ggplot(data=d13_dat,aes(x=Day,y=d13)) +
         panel.border=element_rect(fill=NA,colour="black",size=1.5),
         panel.background=element_rect(fill=NA))
 
-ggsave(filename="d13_5_days.jpg",plot=d13_days_fig)
+### Saving Figure 1 as .svg file so journal can format figure for publication
+ggsave(filename="SVG Figures for Pedosphere/Figure1.svg",plot=d13_days_fig,device="svg")
+ggsave(filename="Figure1.jpeg",plot=d13_days_fig,device="jpeg") # When you save as a .pdf, the delta and per mil symbols in the axis label get screwed up, for some reason this doesn't happen when you save as a .jpeg
 
 # Distrubtion in mesocosm proximity to spruce, blueberry ------------------
 
